@@ -3,9 +3,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "nuxt build",
+    "build": "node scripts/render-og-image.mjs && nuxt build",
     "dev": "nuxt dev",
-    "generate": "nuxt generate",
+    "generate": "node scripts/render-og-image.mjs && nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
@@ -20,7 +20,11 @@
     "vue-router": "^5.3.1"
   },
   "devDependencies": {
+    "@fontsource/aleo": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@resvg/resvg-js": "^2.6.2",
     "@types/three": "^0.186.0",
+    "satori": "^0.33.5",
     "typescript": "^6.0.3"
   },
   "devEngines": {

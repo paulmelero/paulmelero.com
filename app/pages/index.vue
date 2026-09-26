@@ -7,6 +7,11 @@ useHead({
       content:
         'Paul Melero builds things, sometimes with code. Engineer, creative thinker. Personal landing card.',
     },
+    { property: 'og:image', content: 'https://paulmelero.com/og-image.png' },
+    { property: 'og:image:width', content: '1200' },
+    { property: 'og:image:height', content: '630' },
+    { property: 'og:image:alt', content: 'Paul Melero — human | engineer' },
+    { name: 'twitter:image', content: 'https://paulmelero.com/og-image.png' },
   ],
 })
 
