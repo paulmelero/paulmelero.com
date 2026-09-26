@@ -28,7 +28,7 @@ const BAYER = [
 ]
 
 type Cell = {
-  glyph: string
+  level: number
   h: number
   s: number
   density: number
@@ -160,9 +160,8 @@ function buildSampler() {
       const density = a < 0.28 ? 0 : Math.pow(clamp((dlum - min) / range, 0, 1), 1.2)
       const bayer = (BAYER[y % 4][x % 4] / 16 - 0.47) * 0.75
       const level = Math.round(clamp(density * 1.25 + bayer, 0, 1) * (RAMP.length - 1))
-      const glyph = a < 0.28 ? ' ' : RAMP[level]
       const { h, s } = rgbToHsl(colour[i], colour[i + 1], colour[i + 2])
-      cells.push({ glyph, h, s, density, cov: a })
+      cells.push({ level, h, s, density, cov: a })
     }
   }
 }
@@ -186,8 +185,10 @@ function draw() {
     const ny = y / (rows - 1)
     for (let x = 0; x < cols; x++) {
       const cell = cells[y * cols + x]
-      if (!cell || cell.glyph === ' ') continue
+      if (!cell || cell.cov < 0.28) continue
       const nx = x / (cols - 1)
+      // On paper the ink marks the shadows, so coverage mirrors the density.
+      const glyph = RAMP[light ? RAMP.length - 1 - cell.level : cell.level]
 
       const t = cell.density
       const baseSat = clamp(cell.s * (light ? 1.75 : 1.5), 0.03, 1)
@@ -208,7 +209,7 @@ function draw() {
       const sat = clamp(baseSat * (0.95 + 0.3 * k), 0.08, 1)
 
       ctx.fillStyle = `hsl(${hue | 0} ${(sat * 100) | 0}% ${(lum * 100) | 0}%)`
-      ctx.fillText(cell.glyph, x * cellW, y * cellH)
+      ctx.fillText(glyph, x * cellW, y * cellH)
     }
   }
 }

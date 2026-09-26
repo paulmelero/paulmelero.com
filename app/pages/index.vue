@@ -344,7 +344,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
           </div>
           <div class="titleblock__cell">
             <span class="titleblock__key u-mono">size</span>
-            <span class="footer-size">A4</span>
+            <span class="footer-size">A1</span>
           </div>
         </div>
       </div>
@@ -791,6 +791,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
   font-family: var(--brand-font);
   font-size: clamp(1.25rem, 0.9rem + 1.6vw, 2rem);
   font-weight: 500;
+  text-box-trim: trim-both;
 }
 
 /* ---------- Responsive ---------- */

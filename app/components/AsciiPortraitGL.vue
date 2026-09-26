@@ -45,7 +45,13 @@ let densityImg: ImageBitmap | null = null
 let analysis: HTMLCanvasElement | null = null
 let analysisCtx: CanvasRenderingContext2D | null = null
 
-let layout = { cols: 0, rows: 0, cellW: 0, cellH: 0, rect: [0, 0, 0, 0] as number[] }
+let layout = {
+  cols: 0,
+  rows: 0,
+  cellW: 0,
+  cellH: 0,
+  rect: [0, 0, 0, 0] as number[],
+}
 
 let rafId = 0
 let running = false
@@ -76,7 +82,9 @@ function makeBayer(size: number) {
   let m: number[][] = [[0]]
   while (m.length < size) {
     const s = m.length
-    const next = Array.from({ length: s * 2 }, () => Array<number>(s * 2).fill(0))
+    const next = Array.from({ length: s * 2 }, () =>
+      Array<number>(s * 2).fill(0),
+    )
     for (let y = 0; y < s; y++) {
       for (let x = 0; x < s; x++) {
         const v = m[y][x] * 4
@@ -94,7 +102,13 @@ function makeBayer(size: number) {
       data[y * size + x] = Math.round((m[y][x] / (size * size)) * 255)
     }
   }
-  const tex = new three.DataTexture(data, size, size, three.RedFormat, three.UnsignedByteType)
+  const tex = new three.DataTexture(
+    data,
+    size,
+    size,
+    three.RedFormat,
+    three.UnsignedByteType,
+  )
   tex.minFilter = three.NearestFilter
   tex.magFilter = three.NearestFilter
   tex.wrapS = three.ClampToEdgeWrapping
@@ -129,17 +143,6 @@ function buildAtlas(cellW: number, cellH: number) {
   return tex
 }
 
-function readGround(): ThreeNS.Color | null {
-  if (!three) return null
-  const raw = getComputedStyle(document.documentElement).getPropertyValue('--bg-2').trim()
-  if (!raw) return new three.Color(0x101513)
-  try {
-    return new three.Color(raw)
-  } catch {
-    return new three.Color(0x101513)
-  }
-}
-
 function computeRect() {
   if (!colorImg) return [0, 0, 0, 0]
   const { cols, rows, cellW, cellH } = layout
@@ -158,7 +161,8 @@ function computeRect() {
 }
 
 function analyze() {
-  if (!colorImg || !densityImg || !analysisCtx || !analysis) return { min: 0, range: 1 }
+  if (!colorImg || !densityImg || !analysisCtx || !analysis)
+    return { min: 0, range: 1 }
   const { cols, rows } = layout
   const rect = layout.rect
   analysis.width = cols
@@ -178,7 +182,10 @@ function analyze() {
       const i = (y * cols + x) * 4
       if (colour[i + 3] / 255 < AGE_THRESHOLD) continue
       const lum =
-        (0.2126 * densityMap[i] + 0.7152 * densityMap[i + 1] + 0.0722 * densityMap[i + 2]) / 255
+        (0.2126 * densityMap[i] +
+          0.7152 * densityMap[i + 1] +
+          0.0722 * densityMap[i + 2]) /
+        255
       if (lum < min) min = lum
       if (lum > max) max = lum
     }
@@ -190,18 +197,29 @@ function applyUniforms() {
   if (!material || !three) return
   const u = material.uniforms
   u.uGrid.value.set(layout.cols, layout.rows)
-  u.uRect.value.set(layout.rect[0], layout.rect[1], layout.rect[2], layout.rect[3])
+  u.uRect.value.set(
+    layout.rect[0],
+    layout.rect[1],
+    layout.rect[2],
+    layout.rect[3],
+  )
   const stats = analyze()
   u.uMin.value = stats.min
   u.uRange.value = stats.range
-  const ground = readGround()
-  if (ground) u.uGround.value.copy(ground)
   u.uLight.value = props.theme === 'light' ? 1 : 0
   u.uTintHue.value = props.activeHue == null ? -1 : props.activeHue
 }
 
 function buildLayout() {
-  if (!three || !renderer || !canvasEl.value || !wrapEl.value || !colorImg || !densityImg) return
+  if (
+    !three ||
+    !renderer ||
+    !canvasEl.value ||
+    !wrapEl.value ||
+    !colorImg ||
+    !densityImg
+  )
+    return
   const side = wrapEl.value.clientWidth
   if (!side) return
 
@@ -326,7 +344,6 @@ uniform float uPhase;
 uniform float uPulse;
 uniform float uTintHue;
 uniform float uLight;
-uniform vec3 uGround;
 
 uniform sampler2D uColorTex;
 uniform sampler2D uDensityTex;
@@ -359,14 +376,14 @@ void main() {
   vec2 imgUv = (center - uRect.xy) / uRect.zw;
 
   if (imgUv.x < 0.0 || imgUv.x > 1.0 || imgUv.y < 0.0 || imgUv.y > 1.0) {
-    gl_FragColor = vec4(uGround, 1.0);
+    gl_FragColor = vec4(0.0);
     return;
   }
 
   vec4 src = texture2D(uColorTex, imgUv);
   float a = src.a;
   if (a < 0.28) {
-    gl_FragColor = vec4(uGround, 1.0);
+    gl_FragColor = vec4(0.0);
     return;
   }
 
@@ -377,6 +394,8 @@ void main() {
   float bayer = (texture2D(uBayerTex, (mod(cell, 8.0) + 0.5) / 8.0).r - 0.47) * 0.75;
   float level = clamp(density * 1.25 + bayer, 0.0, 1.0) * (RAMP_LEN - 1.0);
   float glyphIndex = floor(level + 0.5);
+  // On paper the ink marks the shadows, so coverage mirrors the density.
+  if (uLight > 0.5) glyphIndex = (RAMP_LEN - 1.0) - glyphIndex;
 
   vec2 atlasUv = vec2((glyphIndex + cellLocal.x) / RAMP_LEN, cellLocal.y);
   float mask = texture2D(uAtlasTex, atlasUv).a;
@@ -407,8 +426,9 @@ void main() {
   vec3 spectrum = 0.5 + 0.5 * cos(6.28318 * (vec3(0.0, 0.33, 0.67) + n.x * 0.6 + n.y * 0.4 + uPulse * 0.25));
   glyph += spectrum * holo * mask;
 
-  vec3 col = mix(uGround, clamp(glyph, 0.0, 1.0), mask * a);
-  gl_FragColor = vec4(col, 1.0);
+  // Premultiplied alpha so the transparent canvas composites cleanly over the page ground.
+  float cov = mask * a;
+  gl_FragColor = vec4(clamp(glyph, 0.0, 1.0) * cov, cov);
 }
 `
 
@@ -424,7 +444,9 @@ async function loadBitmap(src: string) {
 }
 
 onMounted(async () => {
-  reducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  reducedMotion.value = window.matchMedia(
+    '(prefers-reduced-motion: reduce)',
+  ).matches
   if (!canvasEl.value) return
 
   try {
@@ -440,7 +462,7 @@ onMounted(async () => {
     renderer = new three.WebGLRenderer({
       canvas: canvasEl.value,
       antialias: false,
-      alpha: false,
+      alpha: true,
       powerPreference: 'low-power',
     })
   } catch {
@@ -492,7 +514,6 @@ onMounted(async () => {
     uPulse: { value: 0.5 },
     uTintHue: { value: -1 },
     uLight: { value: 0 },
-    uGround: { value: new three.Color(0x101513) },
     uColorTex: { value: colorTex },
     uDensityTex: { value: densityTex },
     uAtlasTex: { value: atlasTex },
@@ -568,7 +589,7 @@ watch(
   () => {
     if (!material || !three) return
     applyUniforms()
-    if (reducedMotion.value) draw()
+    if (reducedMotion.value || running) draw()
   },
 )
 </script>
@@ -581,7 +602,12 @@ watch(
     @pointerleave="onPointerLeave"
     @pointercancel="onPointerLeave"
   >
-    <canvas ref="canvasEl" class="ascii-portrait__canvas" role="img" :aria-label="label" />
+    <canvas
+      ref="canvasEl"
+      class="ascii-portrait__canvas"
+      role="img"
+      :aria-label="label"
+    />
   </div>
 </template>
 
