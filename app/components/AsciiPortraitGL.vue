@@ -25,7 +25,12 @@ const emit = defineEmits<{ fail: [] }>()
 const wrapEl = ref<HTMLElement | null>(null)
 const canvasEl = ref<HTMLCanvasElement | null>(null)
 
-const RAMP = ' .:-=+*#%@'
+// See https://asciiart.pro/guides/best-ascii-character-ramps
+// https://inkmeascii.com/blog/best-ascii-characters/
+// ' ░▒▓█'
+// ' .:-=+*#%@'
+// ' _.-=+:;cba!?0123456789$W#@'
+const RAMP = ' _.-=+:;cba!?0123456789$W#@'
 const AGE_THRESHOLD = 0.28
 
 let three: ThreeModule | null = null
@@ -344,13 +349,12 @@ uniform float uPhase;
 uniform float uPulse;
 uniform float uTintHue;
 uniform float uLight;
+uniform float uRampLen;
 
 uniform sampler2D uColorTex;
 uniform sampler2D uDensityTex;
 uniform sampler2D uAtlasTex;
 uniform sampler2D uBayerTex;
-
-const float RAMP_LEN = 10.0;
 
 vec3 rgb2hsv(vec3 c) {
   vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
@@ -392,12 +396,12 @@ void main() {
   density = pow(density, 1.2);
 
   float bayer = (texture2D(uBayerTex, (mod(cell, 8.0) + 0.5) / 8.0).r - 0.47) * 0.75;
-  float level = clamp(density * 1.25 + bayer, 0.0, 1.0) * (RAMP_LEN - 1.0);
+  float level = clamp(density * 1.25 + bayer, 0.0, 1.0) * (uRampLen - 1.0);
   float glyphIndex = floor(level + 0.5);
   // On paper the ink marks the shadows, so coverage mirrors the density.
-  if (uLight > 0.5) glyphIndex = (RAMP_LEN - 1.0) - glyphIndex;
+  if (uLight > 0.5) glyphIndex = (uRampLen - 1.0) - glyphIndex;
 
-  vec2 atlasUv = vec2((glyphIndex + cellLocal.x) / RAMP_LEN, cellLocal.y);
+  vec2 atlasUv = vec2((glyphIndex + cellLocal.x) / uRampLen, cellLocal.y);
   float mask = texture2D(uAtlasTex, atlasUv).a;
 
   vec3 hsv = rgb2hsv(src.rgb);
@@ -514,6 +518,7 @@ onMounted(async () => {
     uPulse: { value: 0.5 },
     uTintHue: { value: -1 },
     uLight: { value: 0 },
+    uRampLen: { value: RAMP.length },
     uColorTex: { value: colorTex },
     uDensityTex: { value: densityTex },
     uAtlasTex: { value: atlasTex },

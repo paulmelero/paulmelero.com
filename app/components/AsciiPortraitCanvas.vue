@@ -19,7 +19,7 @@ const props = withDefaults(
 const wrapEl = ref<HTMLElement | null>(null)
 const canvasEl = ref<HTMLCanvasElement | null>(null)
 
-const RAMP = ' .:-=+*#%@'
+const RAMP = ' _.-=+:;cba!?0123456789$W#@'
 const BAYER = [
   [0, 8, 2, 10],
   [12, 4, 14, 6],

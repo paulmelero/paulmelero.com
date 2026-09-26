@@ -26,7 +26,7 @@ Used live during presentations (projected, and visited from slides), shared in c
 
 - Single-page landing. In-page anchor navigation only: a "work/links" section and a contact section. No blog, no CMS, no auth, no forms.
 - External destinations: graficos.net, flipthecoin.app, plus social profiles extracted from graficos.net (Bluesky, GitHub, LinkedIn). May include an Atom/RSS link if useful.
-- Contact email: `paul@paulmelero.com`.
+- Contact email: `contact@paulmelero.com`.
 - Dark and light themes; user-switchable.
 - Nuxt 4 with `@nuxt/fonts`, `@nuxt/icon`, `@nuxt/eslint` already scaffolded. Fonts fixed by the user: Space Grotesk (300 700) and IBM Plex Mono (100–700, normal + italic).
 - The portrait (`public/me.png`) is rendered as an interactive ascii/dither treatment in the hero; implementation may be WebGL/Three.js or a lighter equivalent, at the user's stated openness. Slightly interactive (card-tilt on hover) with a holographic/reflection character tied to the ascii colours.

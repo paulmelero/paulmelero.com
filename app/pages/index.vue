@@ -59,7 +59,7 @@ function setHue(hue: number | null) {
 }
 
 async function copyEmail() {
-  const email = 'paul@paulmelero.com'
+  const email = 'contact@paulmelero.com'
   try {
     await navigator.clipboard.writeText(email)
   } catch {
@@ -282,8 +282,8 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
             Feel free to reach out by email, or find me on social media.
           </p>
           <div class="contact__mail">
-            <a class="contact__email" href="mailto:paul@paulmelero.com"
-              >paul@paulmelero.com</a
+            <a class="contact__email" href="mailto:contact@paulmelero.com"
+              >contact@paulmelero.com</a
             >
             <button class="u-cmd" type="button" @click="copyEmail">
               <svg class="arrow" viewBox="0 0 16 16" aria-hidden="true">
