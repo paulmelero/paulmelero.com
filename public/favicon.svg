@@ -1,17 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 4" width="32" height="32">
   <style>
-    .b { fill: #0a0c0b; }
     .m { fill: #7dffa0; }
     @media (prefers-color-scheme: light) {
-      .b { fill: #f2efe6; }
       .m { fill: #0a0c0b; }
     }
   </style>
-  <rect class="b" x="0" y="0" width="4" height="4" />
   <g class="m">
     <rect x="0" y="0" width="1.6" height="1.6" opacity="1" />
     <rect x="2.4" y="0" width="1.6" height="1.6" opacity="0.35" />
     <rect x="0" y="2.4" width="1.6" height="1.6" opacity="0.65" />
-    <rect x="2.4" y="2.4" width="1.6" height="1.6" opacity="0.2" />
   </g>
 </svg>

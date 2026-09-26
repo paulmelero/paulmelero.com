@@ -7,6 +7,7 @@
     "dev": "nuxt dev",
     "generate": "node scripts/render-og-image.mjs && nuxt generate",
     "preview": "nuxt preview",
+    "favicons": "node scripts/render-favicons.mjs",
     "deploy": "nuxt build && wrangler deploy",
     "postinstall": "nuxt prepare"
   },
