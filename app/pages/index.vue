@@ -29,7 +29,7 @@ const links = [
   {
     name: 'Flipthecoin.app',
     href: 'https://flipthecoin.app/',
-    note: '3D coin flip simulator with a real physics engine — where I blog about interesting math/statistics topics.',
+    note: '3D coin flip simulator with a real physics engine — where I blog about interesting probability and math topics.',
   },
 ]
 
