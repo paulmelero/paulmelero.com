@@ -1,3 +1,4 @@
 <template>
-  <div>hello world</div>
+  <NuxtRouteAnnouncer />
+  <NuxtPage />
 </template>
